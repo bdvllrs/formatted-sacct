@@ -53,8 +53,9 @@ To change the displayed columns.
 
 ```
 RS_COLOR_ERROR="red"
-RS_COLOR_RUNNING="green"
-RS_COLOR_PENDING="blue"
+RS_COLOR_RUNNING="blue"
+RS_COLOR_COMPLETED="green"
+RS_COLOR_PENDING="purple"
 ```
 
 To change the displayed colors.

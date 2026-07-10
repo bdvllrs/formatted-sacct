@@ -14,7 +14,7 @@ from rich.table import Table
 COLORS = {
     "running": environ.get("RS_COLOR_RUNNING", "deep_sky_blue1"),
     "error": environ.get("RS_COLOR_ERROR", "bright_red"),
-    "completed": environ.get("RS_COLOR_ERROR", "green3"),
+    "completed": environ.get("RS_COLOR_COMPLETED", "green3"),
     "pending": environ.get("RS_COLOR_PENDING", "medium_purple1"),
 }
 DEFAULT_ARGS = {
