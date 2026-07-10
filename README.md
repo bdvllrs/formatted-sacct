@@ -1,8 +1,12 @@
 # squeue and sacct displayed with rich
 
-Install:
+Use:
 ```
-uvx rs --from path/to/code
+uvx rs --from https://github.com/bdvllrs/formatted-sacct.git
+```
+Or install
+```
+uv tool install rs --from https://github.com/bdvllrs/formatted-sacct.git
 ```
 
 ## Commands
