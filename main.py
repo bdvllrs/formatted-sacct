@@ -32,6 +32,7 @@ DEFAULT_ARGS = {
     "Mem": "tres.mem",
     "CPUs": "tres.cpu",
     "GPUs": "tres.gres/gpu",
+    "Energy": "energy_consumption",
     "Exit": "exit_code",
 }
 
@@ -48,6 +49,9 @@ STATE_TO_COLOR = {
     "CANCELLED": "cancelled",
 }
 
+GPU_THERMAL_DESIGN_POWER = float(environ.get("RS_GPU_TDP", 700))
+CPU_THERMAL_DESIGN_POWER = float(environ.get("RS_GPU_TDP", 0))
+
 
 _callbacks: dict[str, Any] = {}
 
@@ -61,7 +65,7 @@ def extract(*names: str):
     return aux
 
 
-def display_mem(val: int) -> str:
+def display_mem(val: float) -> str:
     return f"{val // 1024}G"
 
 
@@ -142,6 +146,13 @@ def _(_name: str, job: dict[str, Any]) -> str:
     return job["state"]["reason"]
 
 
+def get_tres(type_: str, name: str, resources: list[dict[str, Any]]) -> float:
+    for tres in resources:
+        if tres["type"] == type_ and tres["name"] == name:
+            return tres["count"]
+    return 0
+
+
 @extract(
     "tres.allocated.mem",
     "tres.allocated.gres/gpu",
@@ -155,12 +166,10 @@ def _(_name: str, job: dict[str, Any]) -> str:
 def _(name: str, job: dict[str, Any]) -> str:
     parts = name.split(".")
     type_, _, name = parts[-1].partition("/")
-    for tres in job["tres"][parts[1]]:
-        if tres["type"] == type_ and tres["name"] == name:
-            if type_ == "mem":
-                return display_mem(tres["count"])
-            return str(tres["count"])
-    return "0"
+    out = get_tres(type_, name, job["tres"][parts[1]])
+    if type_ == "mem":
+        return display_mem(out)
+    return str(out)
 
 
 @extract(
@@ -175,6 +184,21 @@ def _(name: str, job: dict[str, Any]) -> str:
     else:
         name = f"tres.allocated.{name[5:]}"
     return _callbacks[name](job)
+
+
+@extract("energy_consumption")
+def _(name: str, job: dict[str, Any]) -> str:
+    state = job["state"]["current"][0]
+    if state == "PENDING":
+        return "-"
+    elapsed = job["time"]["elapsed"] / 3600
+    n_cpu = get_tres("cpu", "", job["tres"]["allocated"])
+    n_gpu = get_tres("gres", "gpu", job["tres"]["allocated"])
+    print(elapsed, n_cpu, n_gpu)
+    consumed = elapsed * (
+        n_cpu * CPU_THERMAL_DESIGN_POWER + n_gpu * GPU_THERMAL_DESIGN_POWER
+    )
+    return f"{int(consumed)}Wh"
 
 
 def parse_args() -> tuple[argparse.Namespace, list[str]]:
