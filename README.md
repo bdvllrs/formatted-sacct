@@ -2,11 +2,11 @@
 
 Use:
 ```
-uvx rs --from https://github.com/bdvllrs/formatted-sacct.git
+uvx rs --from https://github.com/bdvllrs/rich-slurm
 ```
 Or install
 ```
-uv tool install rs --from https://github.com/bdvllrs/formatted-sacct.git
+uv tool install rs --from https://github.com/bdvllrs/rich-slurm
 ```
 
 ## Commands
