@@ -274,12 +274,17 @@ def print_columns():
 
 def main():
     args, extras = parse_args()
+    only_my_jobs = False
+
     if args.command == "me":
         jobs = my_jobs(extras)
+        only_my_jobs = True
     elif args.command == "job":
         jobs = specific_job(args.job_id, extras)
     elif args.command == "queue":
         jobs = queued_jobs(args.me, extras)
+        if args.me:
+            only_my_jobs = True
     elif args.command == "columns":
         print_columns()
         return
@@ -314,11 +319,13 @@ def main():
         table.add_column(col, col)
     for job in jobs:
         state = _callbacks["state.current"](job)
+        styles = []
         if state in STATE_TO_COLOR:
-            style = COLORS[STATE_TO_COLOR[state]]
-        else:
-            style = None
-        table.add_row(*get_row(job, cols), style=style)
+            styles.append(COLORS[STATE_TO_COLOR[state]])
+        username = _callbacks["user"](job)
+        if username == getlogin() and not only_my_jobs:
+            styles.append("bold")
+        table.add_row(*get_row(job, cols), style=" ".join(styles))
     console = Console()
     console.print(table)
 
