@@ -194,7 +194,6 @@ def _(name: str, job: dict[str, Any]) -> str:
     elapsed = job["time"]["elapsed"] / 3600
     n_cpu = get_tres("cpu", "", job["tres"]["allocated"])
     n_gpu = get_tres("gres", "gpu", job["tres"]["allocated"])
-    print(elapsed, n_cpu, n_gpu)
     consumed = elapsed * (
         n_cpu * CPU_THERMAL_DESIGN_POWER + n_gpu * GPU_THERMAL_DESIGN_POWER
     )
