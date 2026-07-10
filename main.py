@@ -8,6 +8,7 @@ from functools import partial
 from os import environ, getlogin
 from typing import Any
 
+from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
 
@@ -266,7 +267,7 @@ def queued_jobs(me: str, sacct_args: list[str]) -> list[dict[str, Any]]:
 
 
 def print_columns():
-    print(list(_callbacks.keys()))
+    rprint("[green]" + "[/green], [green]".join(_callbacks.keys()) + "[/green]")
 
 
 def main():
@@ -295,9 +296,17 @@ def main():
             name, _, val = key.partition(":")
             if not len(val):
                 val = name
-            args[name.strip()] = val.strip()
+            name, val = name.strip(), val.strip()
+            if name not in args:
+                print(f"{name} is not a valid column, skipping. Valid columns: ")
+                print_columns()
+            else:
+                args[name] = val
     else:
         args = DEFAULT_ARGS
+    if not len(args):
+        print("No column to show.")
+        return
     header, cols = zip(*args.items())
     for col in header:
         table.add_column(col, col)
