@@ -56,6 +56,7 @@ RS_COLOR_ERROR="red"
 RS_COLOR_RUNNING="blue"
 RS_COLOR_COMPLETED="green"
 RS_COLOR_PENDING="purple"
+RS_COLOR_CANCELLED="orange3"
 ```
 
 To change the displayed colors.

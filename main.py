@@ -17,6 +17,7 @@ COLORS = {
     "error": environ.get("RS_COLOR_ERROR", "bright_red"),
     "completed": environ.get("RS_COLOR_COMPLETED", "green3"),
     "pending": environ.get("RS_COLOR_PENDING", "medium_purple1"),
+    "cancelled": environ.get("RS_COLOR_CANCELLED", "orange3"),
 }
 DEFAULT_ARGS = {
     "Id": "job_id",
@@ -44,6 +45,7 @@ STATE_TO_COLOR = {
     "NODE_FAIL": "error",
     "OUT_OF_MEMORY": "error",
     "TIMEOUT": "error",
+    "CANCELLED": "cancelled",
 }
 
 
@@ -312,7 +314,11 @@ def main():
         table.add_column(col, col)
     for job in jobs:
         state = _callbacks["state.current"](job)
-        table.add_row(*get_row(job, cols), style=COLORS[STATE_TO_COLOR[state]])
+        if state in STATE_TO_COLOR:
+            style = COLORS[STATE_TO_COLOR[state]]
+        else:
+            style = None
+        table.add_row(*get_row(job, cols), style=style)
     console = Console()
     console.print(table)
 
